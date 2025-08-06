@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crowd Vote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f4f8;
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h2 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .option {
+      margin: 20px auto;
+      width: 300px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.2s;
+      border: 2px solid transparent;
+    }
+
+    .option:hover {
+      background-color: #d6f5f3;
+      transform: scale(1.03);
+    }
+
+    .option.selected {
+      border-color: #3498db;
+      background-color: #eaf6ff;
+    }
+
+    .option-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 20px;
+      background-color: #82e0aa;
+      border-radius: 5px;
+      margin-top: 8px;
+      text-align: center;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .submit-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+      background-color: #2c80ba;
+    }
+
+    .reset-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      margin-left: 10px;
+      font-size: 16px;
+    }
+
+    .results {
+      margin-top: 40px;
+      background-color: #fff3cd;
+      padding: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .results h3 {
+      margin-bottom: 10px;
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Which game do you like?</h2>
+
+  <div id="options"></div>
+
+  <button class="submit-btn" onclick="submitVote()">Submit Vote</button>
+  <button class="reset-btn" onclick="resetVotes()">Reset All Votes</button>
+
+  <div class="results" id="results-box">
+    <h3>Results Summary</h3>
+    <p id="total-votes">Total votes: 0</p>
+    <p id="leading-option">Leading: N/A</p>
+  </div>
+
+  <script>
+    const options = ["Cricket", "Football", "Hockey", "Basketball"];
+    let votes = JSON.parse(localStorage.getItem("votes")) || [0, 0, 0, 0];
+    let selectedIndex = null;
+
+    function render() {
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+      const total = votes.reduce((a, b) => a + b, 0);
+
+      options.forEach((opt, i) => {
+        const percent = total ? ((votes[i] / total) * 100).toFixed(1) : 0;
+        const selectedClass = selectedIndex === i ? "selected" : "";
+        container.innerHTML += `
+          <div class="option ${selectedClass}" onclick="selectOption(${i})">
+            <div class="option-title">${opt}</div>
+            <div class="bar" style="width:${percent}%">${votes[i]} votes (${percent}%)</div>
+          </div>
+        `;
+      });
+
+      document.getElementById("total-votes").innerText = `Total votes: ${total}`;
+
+      const maxVotes = Math.max(...votes);
+      const leaders = votes
+        .map((v, i) => (v === maxVotes ? options[i] : null))
+        .filter(Boolean);
+
+      document.getElementById("leading-option").innerText =
+        maxVotes === 0 ? "Leading: N/A" : `Leading: ${leaders.join(", ")}`;
+    }
+
+    function selectOption(index) {
+      selectedIndex = index;
+      render();
+    }
+
+    function submitVote() {
+      if (selectedIndex === null) {
+        alert("Please select a game before submitting.");
+        return;
+      }
+
+      votes[selectedIndex]++;
+      localStorage.setItem("votes", JSON.stringify(votes));
+      alert(`Thanks for voting for ${options[selectedIndex]}!`);
+      selectedIndex = null;
+      render();
+    }
+
+    function resetVotes() {
+      votes = new Array(options.length).fill(0);
+      localStorage.setItem("votes", JSON.stringify(votes));
+      selectedIndex = null;
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
