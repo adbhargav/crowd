@@ -3,8 +3,11 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 
-const ADMIN_EMAIL = "saicharan172005@gmail.com";
-const ADMIN_PASSWORD = "saicharan17";
+// ✅ Multiple admin accounts
+const ADMINS = [
+  { email: "saicharan172005@gmail.com", password: "saicharan17" },
+  { email: "sabiyaalamuru@gmail.com", password: "Sabiya@4088" }, // Add more here
+];
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -23,7 +26,11 @@ const SignIn = () => {
       await signInWithEmailAndPassword(auth, form.email, form.password);
 
       // Admin check
-      if (form.email === ADMIN_EMAIL && form.password === ADMIN_PASSWORD) {
+      const matchedAdmin = ADMINS.find(
+        (admin) => admin.email === form.email && admin.password === form.password
+      );
+
+      if (matchedAdmin) {
         setIsAdmin(true);
         fetchVotes();
       } else {
