@@ -16,7 +16,7 @@ const Header = () => {
           onClick={handleLinkClick}
         >
           <img
-            src="/logo.png"
+            src="/logo.jpg"
             alt="CrowdVote Logo"
             className="h-12 w-12 md:h-16 md:w-16 rounded-full border-4 border-blue-600"
           />
